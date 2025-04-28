@@ -6,11 +6,16 @@ TARGET := asdf
 # It sets FULL_VERSION to a dev version containing the SHA of the current
 # commit. If we ever use this Makefile to generate release binaries this code
 # will need to change.
-FULL_VERSION = "$(shell git rev-parse --short HEAD)-dev"
-LINKER_FLAGS = '-s -X main.version=${FULL_VERSION}'
+DEV_VERSION = "$(shell git rev-parse --short HEAD)-dev"
+LINKER_DEV_FLAGS = '-s -X main.version=${DEV_VERSION}'
+VERSION=$(shell git tag --sort=-v:refname | awk NR==1{print})
+LINKER_FLAGS = '-s -X main.version=${VERSION}'
 
 # Not sure what the default location should be for builds
 build: # test lint
+	go build -ldflags=${LINKER_DEV_FLAGS} -o=${TARGET_DIR}/${TARGET} ${MAIN_PACKAGE_PATH}
+
+build-source:
 	go build -ldflags=${LINKER_FLAGS} -o=${TARGET_DIR}/${TARGET} ${MAIN_PACKAGE_PATH}
 
 fmt:
